@@ -1042,8 +1042,9 @@ $(dotdot_objects) $(c_normal_objects): PRIVATE_ARM_CFLAGS := $(normal_objects_cf
 c_objects        := $(c_arm_objects) $(c_normal_objects)
 
 ifneq ($(strip $(c_objects)),)
-$(c_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.c \
-    $(my_additional_dependencies)
+$(c_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.c $(yacc_cpps) $(proto_generated_headers) $(nanopb_c_generated_headers) \
+    $(LOCAL_ADDITIONAL_DEPENDENCIES) \
+    | $(my_compiler_dependencies)
 	$(transform-$(PRIVATE_HOST)c-to-o)
 $(call include-depfiles-for-objs, $(c_objects))
 endif
@@ -1063,8 +1064,9 @@ ifneq ($(strip $(gen_c_objects)),)
 # TODO: support compiling certain generated files as arm.
 $(gen_c_objects): PRIVATE_ARM_MODE := $(normal_objects_mode)
 $(gen_c_objects): PRIVATE_ARM_CFLAGS := $(normal_objects_cflags)
-$(gen_c_objects): $(intermediates)/%.o: $(intermediates)/%.c \
-    $(my_additional_dependencies)
+$(gen_c_objects): $(intermediates)/%.o: $(intermediates)/%.c $(yacc_cpps) $(proto_generated_headers) $(nanopb_c_generated_headers) \
+    $(LOCAL_ADDITIONAL_DEPENDENCIES) \
+    | $(my_compiler_dependencies)
 	$(transform-$(PRIVATE_HOST)c-to-o)
 $(call include-depfiles-for-objs, $(gen_c_objects))
 endif

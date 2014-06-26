@@ -1163,6 +1163,7 @@ endef
 ## Commands for running protoc to compile .proto into .pb.cc (or.pb.c) and .pb.h
 ######################################################################
 define transform-proto-to-cc
+
 @echo "Protoc: $@ <= $<"
 @mkdir -p $(dir $@)
 $(hide) $(PROTOC) \
