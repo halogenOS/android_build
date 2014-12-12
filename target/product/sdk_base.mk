@@ -17,7 +17,6 @@
 PRODUCT_PROPERTY_OVERRIDES :=
 
 PRODUCT_PACKAGES := \
-	CubeLiveWallpapers \
 	CustomLocale \
 	Development \
 	Dialer \
@@ -25,13 +24,8 @@ PRODUCT_PACKAGES := \
 	GestureBuilder \
 	Launcher3 \
 	librs_jni \
-	libwnndict \
-	libWnnEngDic \
-	libWnnJpnDic \
 	LiveWallpapersPicker \
 	Mms \
-	OpenWnn \
-	Protips \
 	rild \
 	SdkSetup \
 	SoftKeyboard \
