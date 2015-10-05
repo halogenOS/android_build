@@ -1961,8 +1961,14 @@ $(INTERNAL_OTA_PACKAGE_TARGET): $(BUILT_TARGET_FILES_PACKAGE) $(DISTTOOLS)
 	   --override_device=$(override_device) \
 	   $(BUILT_TARGET_FILES_PACKAGE) $@
 
-.PHONY: otapackage
+XOS_TARGET_PACKAGE := $(PRODUCT_OUT)/XOS-$(ROM_VERSION).zip
+
+.PHONY: otapackage bacon
 otapackage: $(INTERNAL_OTA_PACKAGE_TARGET)
+bacon: otapackage
+	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(XOS_TARGET_PACKAGE)
+	$(hide) $(MD5SUM) $(XOS_TARGET_PACKAGE) > $(XOS_TARGET_PACKAGE).md5sum
+	@echo -e "Package complete: $(XOS_TARGET_PACKAGE)"
 
 endif    # build_ota_package
 
