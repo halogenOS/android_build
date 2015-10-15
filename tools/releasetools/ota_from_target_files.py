@@ -533,6 +533,8 @@ def GetOemProperty(name, oem_props, oem_dict, info_dict):
 
 
 def CalculateFingerprint(oem_props, oem_dict, info_dict):
+  if OPTIONS.override_prop:
+    return GetBuildProp("ro.build.date.utc", info_dict)
   if oem_props is None:
     return GetBuildProp("ro.build.fingerprint", info_dict)
   return "%s/%s/%s:%s" % (
@@ -955,12 +957,14 @@ def WriteBlockIncrementalOTAPackage(target_zip, source_zip, output_zip):
       metadata=metadata,
       info_dict=OPTIONS.source_info_dict)
 
-  source_fp = CalculateFingerprint(oem_props, oem_dict,
-                                   OPTIONS.source_info_dict)
-  target_fp = CalculateFingerprint(oem_props, oem_dict,
-                                   OPTIONS.target_info_dict)
-  metadata["pre-build"] = source_fp
-  metadata["post-build"] = target_fp
+  if not OPTIONS.override_prop:
+    source_fp = CalculateFingerprint(oem_props, oem_dict,
+                                     OPTIONS.source_info_dict)
+    target_fp = CalculateFingerprint(oem_props, oem_dict,
+                                     OPTIONS.target_info_dict)
+    metadata["pre-build"] = source_fp
+    metadata["post-build"] = target_fp
+
   metadata["pre-build-incremental"] = GetBuildProp(
       "ro.build.version.incremental", OPTIONS.source_info_dict)
   metadata["post-build-incremental"] = GetBuildProp(
