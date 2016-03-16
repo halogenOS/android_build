@@ -644,6 +644,9 @@ endif
 # Rules for QCOM targets
 include build/core/qcom_target.mk
 
+# Rules for MTK targets
+include vendor/cm/build/core/mtk_target.mk
+
 # ###############################################################
 # Set up final options.
 # ###############################################################
