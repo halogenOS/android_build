@@ -157,8 +157,8 @@ class EdifyGenerator(object):
     self.script.append(self.WordWrap(cmd))
 
   def RunBackup(self, command):
-    self.script.append('package_extract_file("system/bin/backuptool.sh", "/tmp/backuptool.sh");')
-    self.script.append('package_extract_file("system/bin/backuptool.functions", "/tmp/backuptool.functions");')
+    self.script.append('package_extract_file("install/bin/backuptool.sh", "/tmp/backuptool.sh");')
+    self.script.append('package_extract_file("install/bin/backuptool.functions", "/tmp/backuptool.functions");')
     if not self.info.get("use_set_metadata", False):
       self.script.append('set_perm(0, 0, 0755, "/tmp/backuptool.sh");')
       self.script.append('set_perm(0, 0, 0644, "/tmp/backuptool.functions");')
