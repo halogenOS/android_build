@@ -135,7 +135,9 @@ class EdifyGenerator(object):
     cmd = ('assert(' +
            ' || '.join(['getprop("ro.product.device") == "%s" || getprop("ro.build.product") == "%s"'
                          % (i, i) for i in device.split(",")]) +
-           ');')
+           ' || abort("E%d: This package is for device: %s; ' +
+           'this device is " + getprop("ro.product.device") + ".");' +
+           ');') % (common.ErrorCode.DEVICE_MISMATCH, device)
     self.script.append(cmd)
 
   def AssertSomeBootloader(self, *bootloaders):
@@ -152,7 +154,7 @@ class EdifyGenerator(object):
            " || ".join(['getprop("ro.baseband") == "%s"' % (b,)
                          for b in basebands]) +
            ");")
-    self.script.append(self._WordWrap(cmd))
+    self.script.append(self.WordWrap(cmd))
 
   def RunBackup(self, command):
     self.script.append('package_extract_file("system/bin/backuptool.sh", "/tmp/backuptool.sh");')
@@ -416,10 +418,6 @@ class EdifyGenerator(object):
   def AppendExtra(self, extra):
     """Append text verbatim to the output script."""
     self.script.append(extra)
-
-  def Unmount(self, mount_point):
-    self.script.append('unmount("%s");' % mount_point)
-    self.mounts.remove(mount_point)
 
   def UnmountAll(self):
     for p in sorted(self.mounts):
