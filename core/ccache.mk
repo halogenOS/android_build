@@ -38,9 +38,9 @@ ifneq ($(filter-out false,$(USE_CCACHE)),)
   # See http://petereisentraut.blogspot.com/2011/09/ccache-and-clang-part-2.html
   export CCACHE_CPP2 := true
 
-  ifeq ($(HOST_PREFERS_OWN_CCACHE),true)
-    ccache := $(shell which ccache)
-  else
+  ccache := $(shell command -v ccache)
+
+  ifeq ($(ccache),)
     CCACHE_HOST_TAG := $(HOST_PREBUILT_TAG)
     ccache := prebuilts/misc/$(CCACHE_HOST_TAG)/ccache/ccache
   endif
