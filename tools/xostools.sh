@@ -114,9 +114,11 @@ function build() {
                 [ "$buildarg" != "mm" ] && \
                     make -j$THREAD_COUNT_BUILD $module || \
                     mmma -j$THREAD_COUNT_BUILD $module
+                [ $? -ne 0 ] && return $?
             ;;
 
             module-list)
+                local bm_result
                 echob "Starting batch build..."
                 shift
                 ALL_MODULES_TO_BUILD="$@"
@@ -127,8 +129,10 @@ function build() {
                     echob "Building module $module"
                     echo
                     build module $TOOL_THIRDARG $module noclean
+                    local bm_result=$?
                 done
                 echob "Finished batch build"
+                [ $bm_result -ne 0 ] && return $bm_result
             ;;
 
             # Oops.
@@ -176,6 +180,7 @@ function reposync() {
     echo "Using $THREADS_REPO threads for sync."
     repo sync -j$THREADS_REPO  --force-sync \
         -c -f --no-clone-bundle --no-tags $2 $PATH_ARG
+    return $?
 }
 
 # This is repoREsync. It REsyncs. Self-explanatory?
