@@ -2203,7 +2203,8 @@ else
 	$(hide) OTAPACKAGE=$(PWD)/$(INTERNAL_OTA_PACKAGE_TARGET) ./vendor/xos/tools/squisher
 endif
 	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(XOS_TARGET_PACKAGE)
-	$(hide) $(MD5SUM) $(XOS_TARGET_PACKAGE) > $(XOS_TARGET_PACKAGE).md5sum
+	$(hide) $(MD5SUM) $(XOS_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(XOS_TARGET_PACKAGE).md5sum
+	@echo "Package Complete: $(XOS_TARGET_PACKAGE)"
 
  @echo -e ${CL_RST}""${CL_XOS}
  @echo -e ${CL_RST}"  hhhhhhh                               lllllll                                                                            "${CL_XOS}"     OOOOOOOOO        SSSSSSSSSSSSSSS   "${CL_XOS} 
