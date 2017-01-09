@@ -232,13 +232,12 @@ endif
 endif
 
 ifneq ($(USE_CCACHE),)
-    # Detect if the system already has ccache installed to use instead of the prebuilt
-    ccache := $(shell which ccache)
-
-    ifeq ($(ccache),)
-        ccache := $(ANDROID_BUILD_TOP)/prebuilts/misc/$(HOST_PREBUILT_TAG)/ccache/ccache
-        # Check that the executable is here.
-        ccache := $(strip $(wildcard $(ccache)))
+    ifeq ($(HOST_PREFERS_OWN_CCACHE),true)
+      ccache = $(shell which ccache)
+    else
+      ccache := $(ANDROID_BUILD_TOP)/prebuilts/misc/$(HOST_PREBUILT_TAG)/ccache/ccache
+      # Check that the executable is here.
+      ccache := $(strip $(wildcard $(ccache)))
     endif
 endif
 
