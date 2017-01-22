@@ -2172,7 +2172,7 @@ endif
 ifneq ($(TARGET_UNIFIED_DEVICE),)
     OTA_SCRIPT_OVERRIDE_PROP := true
     ifeq ($(TARGET_OTA_ASSERT_DEVICE),)
-        OTA_SCRIPT_OVERRIDE_DEVICE := $(TARGET_OTA_ASSERT_DEVICE)
+        OTA_SCRIPT_OVERRIDE_DEVICE := $(TARGET_DEVICE)
     endif
     $(INTERNAL_OTA_PACKAGE_TARGET): override_prop := --override_prop=true
 endif
