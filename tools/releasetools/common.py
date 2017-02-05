@@ -1393,7 +1393,7 @@ class BlockDifference(object):
         script.Print("YOU NOT GONNA GET VoLTE, CHUTIYA")
       # write the output unconditionally
       script.Print(" ")
-      script.Print("Flashing halogenOS System files...")
+      script.Print("Flashing halogenOS system files...")
     if progress:
       script.ShowProgress(progress, 0)
     self._WriteUpdate(script, output_zip)
@@ -1518,7 +1518,7 @@ class BlockDifference(object):
                          self.device, ranges_str,
                          self._HashZeroBlocks(self.tgt.extended.size())))
       script.Print(" ")
-      script.Print("Verified halogenOS System files...")
+      script.Print("Verified halogenOS system files...")
       script.AppendExtra(
           'else\n'
           '  abort("E%d: %s partition has unexpected non-zero contents after '
@@ -1526,7 +1526,7 @@ class BlockDifference(object):
           'endif;' % (code, partition))
     else:
       script.Print(" ")
-      script.Print("Verified halogenOS System files...")
+      script.Print("Verified halogenOS system files...")
 
     if partition == "system":
       code = ErrorCode.SYSTEM_UNEXPECTED_CONTENTS
