@@ -283,7 +283,7 @@ function reporesync() {
 }
 
 function reporeset() {
-  repo forall -c 'git reset --hard XOS/XOS-7.1 2>/dev/null'
+  repo forall -c 'git cherry-pick --abort; git revert --abort; git rebase --abort; git reset --hard XOS/XOS-7.1 || git reset --hard github/XOS-7.1 || git reset --hard HEAD || git stash' 2>/dev/null
 }
 
 function resetmanifest() {
