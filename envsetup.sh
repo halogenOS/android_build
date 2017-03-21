@@ -591,6 +591,7 @@ function print_lunch_menu()
 
 function brunch()
 {
+    show_lunch_prettyprint
     breakfast $*
     if [ $? -eq 0 ]; then
         time mka bacon
@@ -603,6 +604,7 @@ function brunch()
 
 function breakfast()
 {
+    show_lunch_prettyprint
     target=$1
     XOS_DEVICES_ONLY="true"
     unset LUNCH_MENU_CHOICES
@@ -634,8 +636,8 @@ alias bib=breakfast
 
 function lunch()
 {
-    show_lunch_prettyprint
     local answer
+    show_lunch_prettyprint
     if [ "$1" ] ; then
         answer=$1
     else
