@@ -155,6 +155,7 @@ function reposync() {
     THREADS_REPO=$THREAD_COUNT_N_BUILD
     # Automatic!
     [ -z "$REPO_ARG" ] && REPO_ARG="auto"
+    [ -d "$REPO_ARG" ] && REPO_ARG="auto" && PATH_ARG="$1"
     # Let's decide how much threads to use
     # Self-explanatory.
     case $REPO_ARG in
