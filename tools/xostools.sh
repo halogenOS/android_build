@@ -145,6 +145,7 @@ function build() {
 
         esac
     fi
+    return 0
 }
 
 # Reposync!! Laziness is taking over.
