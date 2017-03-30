@@ -111,10 +111,13 @@ function build() {
                 [ "$cleanarg" == "noclean" ] || make clean
                 # Now start building
                 echo "Using $THREAD_COUNT_BUILD threads for build."
-                [ "$buildarg" != "mm" ] && \
-                    make -j$THREAD_COUNT_BUILD $module || \
+                if [ "$buildarg" != "mm" ]; then
+                    make -j$THREAD_COUNT_BUILD $module
+                    [ $? -ne 0 ] && return $?
+                else
                     mmma -j$THREAD_COUNT_BUILD $module
-                [ $? -ne 0 ] && return $?
+                    [ $? -ne 0 ] && return $?
+                fi
             ;;
 
             module-list)
