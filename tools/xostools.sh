@@ -115,10 +115,10 @@ function build() {
                 echo "Using $THREAD_COUNT_BUILD threads for build."
                 if [ "$buildarg" != "mm" ]; then
                     make -j$THREAD_COUNT_BUILD $module
-                    [ $? -ne 0 ] && return $?
+                    return $?
                 else
                     mmma -j$THREAD_COUNT_BUILD $module
-                    [ $? -ne 0 ] && return $?
+                    return $?
                 fi
             ;;
 
