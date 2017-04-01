@@ -11,16 +11,25 @@ else
 DTBTOOL_NAME := $(TARGET_CUSTOM_DTBTOOL)
 endif
 
+ifeq ($(TARGET_FRESHLY_COMPILED_DTBTOOL),true)
 DTBTOOL := $(HOST_OUT_EXECUTABLES)/$(DTBTOOL_NAME)$(HOST_EXECUTABLE_SUFFIX)
+else
+DTBTOOL := $(ANDROID_BUILD_TOP)/build/tools/$(DTBTOOL_NAME)
+endif
 
 INSTALLED_DTIMAGE_TARGET := $(PRODUCT_OUT)/dt.img
 
+ifeq ($(TARGET_FORCE_STOCK_DTB_SEARCH),true)
+# Most specific paths must come first in possible_dtb_dirs
+possible_dtb_dirs = $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/dts/ $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/
+else
 ifeq ($(strip $(TARGET_CUSTOM_DTBTOOL)),)
 # dtbToolCM will search subdirectories
 possible_dtb_dirs = $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/
 else
 # Most specific paths must come first in possible_dtb_dirs
 possible_dtb_dirs = $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/dts/ $(KERNEL_OUT)/arch/$(KERNEL_ARCH)/boot/
+endif
 endif
 
 define build-dtimage-target
