@@ -110,14 +110,6 @@ if path.exists("%s/system/lib/modules" % out):
         makedirs("%s/system/lib" % zip_dir)
     copytree("%s/system/lib/modules" % out, "%s/system/lib/modules" % zip_dir, symlinks=True)
 
-# strip kernel modules
-kernel_modules = "%s/system/lib/modules" % zip_dir
-for root, dirs, files in walk(kernel_modules):
-    for file in files:
-        fn = path.join(root, file)
-        if not path.islink(fn):
-            call(['arm-eabi-strip', '--strip-unneeded', fn])
-
 # zip package
 with ZipFile("%s.zip" % zip_dir, "w") as zipper:
     rootlen = len(zip_dir) + 1
@@ -127,7 +119,7 @@ with ZipFile("%s.zip" % zip_dir, "w") as zipper:
             if path.islink(fn):
                 sym = ZipInfo(fn[rootlen:])
                 sym.create_system = 3
-                sym.external_attr = 2716663808L
+                sym.external_attr = 2716663808
                 zipper.writestr(sym, fn)
             else:
                 zipper.write(fn, fn[rootlen:])
