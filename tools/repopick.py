@@ -295,6 +295,8 @@ if __name__ == '__main__':
         else:
           if item['project'] in project_name_to_data and item['branch'] in project_name_to_data[item['project']]:
               project_path = project_name_to_data[item['project']][item['branch']]
+          elif os.path.isdir(item['project'].replace("android_", "").replace("_", "/")):
+              project_path = item['project'].replace("android_", "").replace("_", "/")
           elif args.path:
               project_path = args.path
           elif args.ignore_missing:
