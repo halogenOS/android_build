@@ -381,11 +381,11 @@ ifneq (,$(user_variant))
 
 else # !user_variant
   # Turn on checkjni for non-user builds.
-  ADDITIONAL_BUILD_PROPERTIES += ro.kernel.android.checkjni=1
+  #ADDITIONAL_BUILD_PROPERTIES += ro.kernel.android.checkjni=1
   # Set device insecure for non-user builds.
   ADDITIONAL_DEFAULT_PROPERTIES += ro.secure=0
   # Allow mock locations by default for non user builds
-  ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=1
+  #ADDITIONAL_DEFAULT_PROPERTIES += ro.allow.mock.location=1
 endif # !user_variant
 
 ifeq (true,$(strip $(enable_target_debugging)))
