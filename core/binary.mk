@@ -626,40 +626,39 @@ endif
 ## Compile the .proto files to .cc (or .c) and then to .o
 ###########################################################
 proto_sources := $(filter %.proto,$(my_src_files))
-proto_generated_objects :=
-proto_generated_headers :=
 ifneq ($(proto_sources),)
-proto_generated_sources_dir := $(generated_sources_dir)/proto
-proto_generated_obj_dir := $(intermediates)/proto
+proto_gen_dir := $(generated_sources_dir)/proto
 
+my_rename_cpp_ext :=
 ifneq (,$(filter nanopb-c nanopb-c-enable_malloc, $(LOCAL_PROTOC_OPTIMIZE_TYPE)))
 my_proto_source_suffix := .c
 my_proto_c_includes := external/nanopb-c
-my_protoc_flags := --nanopb_out=$(proto_generated_sources_dir) \
+my_protoc_flags := --nanopb_out=$(proto_gen_dir) \
     --plugin=external/nanopb-c/generator/protoc-gen-nanopb
 else
-my_proto_source_suffix := .cc
+my_proto_source_suffix := $(LOCAL_CPP_EXTENSION)
+ifneq ($(my_proto_source_suffix),.cc)
+# aprotoc is hardcoded to write out only .cc file.
+# We need to rename the extension to $(LOCAL_CPP_EXTENSION) if it's not .cc.
+my_rename_cpp_ext := true
+endif
 my_proto_c_includes := external/protobuf/src
 my_cflags += -DGOOGLE_PROTOBUF_NO_RTTI
-my_protoc_flags := --cpp_out=$(proto_generated_sources_dir)
+my_protoc_flags := --cpp_out=$(proto_gen_dir)
 endif
-my_proto_c_includes += $(proto_generated_sources_dir)
+my_proto_c_includes += $(proto_gen_dir)
 
 proto_sources_fullpath := $(addprefix $(LOCAL_PATH)/, $(proto_sources))
-proto_generated_sources := $(addprefix $(proto_generated_sources_dir)/, \
+proto_generated_cpps := $(addprefix $(proto_gen_dir)/, \
     $(patsubst %.proto,%.pb$(my_proto_source_suffix),$(proto_sources_fullpath)))
-proto_generated_headers := $(patsubst %.pb$(my_proto_source_suffix),%.pb.h, $(proto_generated_sources))
-proto_generated_objects := $(addprefix $(proto_generated_obj_dir)/, \
-    $(patsubst %.proto,%.pb.o,$(proto_sources_fullpath)))
-$(call track-src-file-obj,$(proto_sources),$(proto_generated_objects))
 
 define copy-proto-files
 $(if $(PRIVATE_PROTOC_OUTPUT), \
    $(if $(call streq,$(PRIVATE_PROTOC_INPUT),$(PRIVATE_PROTOC_OUTPUT)),, \
    $(eval proto_generated_path := $(dir $(subst $(PRIVATE_PROTOC_INPUT),$(PRIVATE_PROTOC_OUTPUT),$@)))
    @mkdir -p $(dir $(proto_generated_path))
-   @echo "Protobuf relocation: $@ => $(proto_generated_path)"
-   @cp -f $@ $(proto_generated_path) ),)
+   @echo "Protobuf relocation: $(basename $@).h => $(proto_generated_path)"
+   @cp -f $(basename $@).h $(proto_generated_path) ),)
 endef
 
 
@@ -692,7 +691,19 @@ ifeq ($(my_proto_source_suffix),.c)
 else
 	$(transform-$(PRIVATE_HOST)cpp-to-o)
 endif
-$(call include-depfiles-for-objs, $(proto_generated_objects))
+# Ideally we can generate the source directly into $(intermediates).
+# But many Android.mks assume the .pb.hs are in $(generated_sources_dir).
+# As a workaround, we make a copy in the $(intermediates).
+proto_intermediate_dir := $(intermediates)/proto
+proto_intermediate_cpps := $(patsubst $(proto_gen_dir)/%,$(proto_intermediate_dir)/%,\
+    $(proto_generated_cpps))
+$(proto_intermediate_cpps) : $(proto_intermediate_dir)/% : $(proto_gen_dir)/% | $(ACP)
+	@echo "Copy: $@"
+	$(copy-file-to-target)
+	$(hide) cp $(basename $<).h $(basename $@).h
+$(call track-src-file-gen,$(proto_sources),$(proto_intermediate_cpps))
+
+my_generated_sources += $(proto_intermediate_cpps)
 
 my_c_includes += $(my_proto_c_includes)
 # Auto-export the generated proto source dir.
@@ -910,7 +921,7 @@ $(call track-src-file-obj,$(patsubst %,%.arm,$(cpp_arm_sources)),$(cpp_arm_objec
 dotdot_arm_objects :=
 $(foreach s,$(dotdot_arm_sources),\
   $(eval $(call compile-dotdot-cpp-file,$(s),\
-  $(yacc_cpps) $(proto_generated_headers) $(my_additional_dependencies),\
+  $(my_additional_dependencies),\
   dotdot_arm_objects)))
 $(call track-src-file-obj,$(patsubst %,%.arm,$(dotdot_arm_sources)),$(dotdot_arm_objects))
 
@@ -918,7 +929,7 @@ dotdot_sources := $(filter ../%$(LOCAL_CPP_EXTENSION),$(my_src_files))
 dotdot_objects :=
 $(foreach s,$(dotdot_sources),\
   $(eval $(call compile-dotdot-cpp-file,$(s),\
-    $(yacc_cpps) $(proto_generated_headers) $(my_additional_dependencies),\
+    $(my_additional_dependencies),\
     dotdot_objects)))
 $(call track-src-file-obj,$(dotdot_sources),$(dotdot_objects))
 
@@ -936,7 +947,6 @@ cpp_objects        := $(cpp_arm_objects) $(cpp_normal_objects)
 ifneq ($(strip $(cpp_objects)),)
 $(cpp_objects): $(intermediates)/%.o: \
     $(TOPDIR)$(LOCAL_PATH)/%$(LOCAL_CPP_EXTENSION) \
-    $(yacc_cpps) $(proto_generated_headers) \
     $(my_additional_dependencies)
 	$(transform-$(PRIVATE_HOST)cpp-to-o)
 $(call include-depfiles-for-objs, $(cpp_objects))
@@ -958,8 +968,7 @@ ifneq ($(strip $(gen_cpp_objects)),)
 $(gen_cpp_objects): PRIVATE_ARM_MODE := $(normal_objects_mode)
 $(gen_cpp_objects): PRIVATE_ARM_CFLAGS := $(normal_objects_cflags)
 $(gen_cpp_objects): $(intermediates)/%.o: \
-    $(intermediates)/%$(LOCAL_CPP_EXTENSION) $(yacc_cpps) \
-    $(proto_generated_headers) \
+    $(intermediates)/%$(LOCAL_CPP_EXTENSION) \
     $(my_additional_dependencies)
 	$(transform-$(PRIVATE_HOST)cpp-to-o)
 $(call include-depfiles-for-objs, $(gen_cpp_objects))
@@ -1014,7 +1023,7 @@ $(call track-src-file-obj,$(patsubst %,%.arm,$(c_arm_sources)),$(c_arm_objects))
 dotdot_arm_objects :=
 $(foreach s,$(dotdot_arm_sources),\
   $(eval $(call compile-dotdot-c-file,$(s),\
-    $(yacc_cpps) $(proto_generated_headers) $(my_additional_dependencies),\
+    $(my_additional_dependencies),\
     dotdot_arm_objects)))
 $(call track-src-file-obj,$(patsubst %,%.arm,$(dotdot_arm_sources)),$(dotdot_arm_objects))
 
@@ -1022,7 +1031,7 @@ dotdot_sources := $(filter ../%.c, $(my_src_files))
 dotdot_objects :=
 $(foreach s, $(dotdot_sources),\
   $(eval $(call compile-dotdot-c-file,$(s),\
-    $(yacc_cpps) $(proto_generated_headers) $(my_additional_dependencies),\
+    $(my_additional_dependencies),\
     dotdot_objects)))
 $(call track-src-file-obj,$(dotdot_sources),$(dotdot_objects))
 
@@ -1038,7 +1047,7 @@ $(dotdot_objects) $(c_normal_objects): PRIVATE_ARM_CFLAGS := $(normal_objects_cf
 c_objects        := $(c_arm_objects) $(c_normal_objects)
 
 ifneq ($(strip $(c_objects)),)
-$(c_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.c $(yacc_cpps) $(proto_generated_headers) \
+$(c_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.c \
     $(my_additional_dependencies)
 	$(transform-$(PRIVATE_HOST)c-to-o)
 $(call include-depfiles-for-objs, $(c_objects))
@@ -1059,7 +1068,7 @@ ifneq ($(strip $(gen_c_objects)),)
 # TODO: support compiling certain generated files as arm.
 $(gen_c_objects): PRIVATE_ARM_MODE := $(normal_objects_mode)
 $(gen_c_objects): PRIVATE_ARM_CFLAGS := $(normal_objects_cflags)
-$(gen_c_objects): $(intermediates)/%.o: $(intermediates)/%.c $(yacc_cpps) $(proto_generated_headers) \
+$(gen_c_objects): $(intermediates)/%.o: $(intermediates)/%.c \
     $(my_additional_dependencies)
 	$(transform-$(PRIVATE_HOST)c-to-o)
 $(call include-depfiles-for-objs, $(gen_c_objects))
@@ -1074,7 +1083,7 @@ objc_objects := $(addprefix $(intermediates)/,$(objc_sources:.m=.o))
 $(call track-src-file-obj,$(objc_sources),$(objc_objects))
 
 ifneq ($(strip $(objc_objects)),)
-$(objc_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.m $(yacc_cpps) $(proto_generated_headers) \
+$(objc_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.m \
     $(my_additional_dependencies)
 	$(transform-$(PRIVATE_HOST)m-to-o)
 $(call include-depfiles-for-objs, $(objc_objects))
@@ -1089,7 +1098,7 @@ objcpp_objects := $(addprefix $(intermediates)/,$(objcpp_sources:.mm=.o))
 $(call track-src-file-obj,$(objcpp_sources),$(objcpp_objects))
 
 ifneq ($(strip $(objcpp_objects)),)
-$(objcpp_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.mm $(yacc_cpps) $(proto_generated_headers) \
+$(objcpp_objects): $(intermediates)/%.o: $(TOPDIR)$(LOCAL_PATH)/%.mm \
     $(my_additional_dependencies)
 	$(transform-$(PRIVATE_HOST)mm-to-o)
 $(call include-depfiles-for-objs, $(objcpp_objects))
@@ -1219,8 +1228,7 @@ normal_objects := \
     $(c_objects) \
     $(gen_c_objects) \
     $(objc_objects) \
-    $(objcpp_objects) \
-    $(proto_generated_objects)
+    $(objcpp_objects)
 
 new_order_normal_objects := $(foreach f,$(my_src_files),$(my_src_file_obj_$(f)))
 new_order_normal_objects += $(foreach f,$(my_gen_src_files),$(my_src_file_obj_$(f)))
