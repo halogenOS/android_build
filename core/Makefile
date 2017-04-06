@@ -1147,7 +1147,7 @@ $(recovery_ramdisk): $(MINIGZIP) \
 ifndef BOARD_CUSTOM_BOOTIMG_MK
 $(INSTALLED_RECOVERYIMAGE_TARGET): $(MKBOOTIMG) $(recovery_ramdisk) $(recovery_kernel) \
 		$(RECOVERYIMAGE_EXTRA_DEPS)
-  @echo -e ${CL_CYN}"----- Making recovery image ------"${CL_RST}
+	@echo -e ${CL_CYN}"----- Making recovery image ------"${CL_RST}
 	$(call build-recoveryimage-target, $@)
 endif # BOARD_CUSTOM_BOOTIMG_MK
 
