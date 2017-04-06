@@ -23,4 +23,6 @@ PRODUCT_PACKAGES := \
     CallLogBackup \
     CellBroadcastReceiver \
     EmergencyInfo \
-    rild
+    rild \
+    librilutils \
+    sap-api-java-static
