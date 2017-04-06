@@ -642,7 +642,7 @@ else
 endif
 
 # Rules for QCOM targets
-include vendor/cm/build/core/qcom_target.mk
+include build/core/qcom_target.mk
 
 # ###############################################################
 # Set up final options.
