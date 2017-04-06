@@ -141,6 +141,9 @@ endif
 # be generated correctly
 include $(BUILD_SYSTEM)/cleanbuild.mk
 
+# Bring in Qualcomm helper macros
+include build/core/qcom_utils.mk
+
 # Include the google-specific config
 -include vendor/google/build/config.mk
 
