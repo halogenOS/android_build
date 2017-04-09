@@ -18,6 +18,7 @@
 # api compatibility or added apis illegally.
 #
 
+WITHOUT_CHECK_API := true
 # skip api check for PDK buid
 ifeq (,$(filter true, $(WITHOUT_CHECK_API) $(TARGET_BUILD_PDK)))
 
