@@ -85,7 +85,7 @@ function build() {
     buildarg="$1"
     target="$2"
     cleanarg="$3 $4"
-    module="${cleanarg// noclean/}"
+    module="${cleanarg/noclean/}"
     cleanarg="${cleanarg/$module/}"
     cleanarg="${cleanarg// /}"
 
