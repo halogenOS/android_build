@@ -191,11 +191,17 @@ javax\.microedition\.khronos\.egl
 
 android
 
+.*\.cyanogenmod\..*
+.*\.lineageos\..*
+.*\.halogenos\..*
+.*\.xos\..*
+.*\.dirtyunicorns\..*
+
 
 ###################################################
 # telephony-common.jar
 com\.google\..*
-
+.*\.codeaurora\..*
 
 ###################################################
 # apache-xml.jar
@@ -227,3 +233,7 @@ org\.apache\.xalan\.extensions
 org\.apache\.xalan\.processor
 org\.apache\.xalan\.transformer
 org\.apache\.xalan\.xslt
+
+#####################################################
+# okhttp
+.*\.quicinc\..*
