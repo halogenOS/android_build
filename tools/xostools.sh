@@ -85,7 +85,8 @@ function build() {
     buildarg="$1"
     target="$2"
     cleanarg="$3 $4"
-    module="${cleanarg/noclean/}"
+    module="${cleanarg//noclean/}"
+    module="${module// /}"
     cleanarg="${cleanarg/$module/}"
     cleanarg="${cleanarg// /}"
 
@@ -104,7 +105,8 @@ function build() {
 
             full | module | mm)
                 echob "Starting build..."
-                [ -z "$module" ] && module="bacon"
+                [ -z "$module" ] && module="bacon" || \
+                    echo "You have decided to build $module"
                 # Of course let's check the kitchen
                 lunchauto $target
                 # Clean if desired
