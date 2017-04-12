@@ -72,7 +72,11 @@ KERNEL_OUT_STAMP := $(KERNEL_OUT)/.mkdir_stamp
 
 # M uses 4.9 gcc by default, and it's not available in their repos
 # So, use 4.8 gcc for the time being.
+ifeq ($(TARGET_KERNEL_ARCH),arm64)
+KERNEL_GCC_VERSION ?= 4.9
+else
 KERNEL_GCC_VERSION ?= 4.8
+endif
 
 # You can set KERNEL_TOOLCHAIN_PREFIX to get gcc from somewhere else
 ifeq ($(strip $(KERNEL_TOOLCHAIN_PREFIX)),)
@@ -216,9 +220,9 @@ ifneq ($(TARGET_KERNEL_CROSS_COMPILE_PREFIX),)
 TARGET_KERNEL_CROSS_COMPILE_PREFIX := $(strip $(TARGET_KERNEL_CROSS_COMPILE_PREFIX))
 KERNEL_TOOLCHAIN_PREFIX := $(TARGET_KERNEL_CROSS_COMPILE_PREFIX)
 else ifeq ($(KERNEL_ARCH),arm64)
-KERNEL_TOOLCHAIN_PREFIX := aarch64-linux-androidkernel-
+KERNEL_TOOLCHAIN_PREFIX := aarch64-linux-android-$(KERNEL_GCC_VERSION)-
 else ifeq ($(KERNEL_ARCH),arm)
-KERNEL_TOOLCHAIN_PREFIX := arm-linux-androidkernel-
+KERNEL_TOOLCHAIN_PREFIX := arm-linux-androideabi-
 else ifeq ($(KERNEL_ARCH),x86)
 KERNEL_TOOLCHAIN_PREFIX := x86_64-linux-androidkernel-
 endif
