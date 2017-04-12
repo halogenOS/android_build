@@ -129,7 +129,7 @@ TARGET_OPTIMIZATION_LEVEL ?= 2
 TARGET_RELEASE_CFLAGS := \
 			-DNDEBUG \
 			-O$(TARGET_OPTIMIZATION_LEVEL) \
-			-g \
+			-g0 \
 			-Wstrict-aliasing=2 \
 			-fgcse-after-reload \
 			-frerun-cse-after-loop \

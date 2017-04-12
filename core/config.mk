@@ -108,7 +108,6 @@ BUILD_NOTICE_FILE := $(BUILD_SYSTEM)/notice_files.mk
 BUILD_HOST_DALVIK_JAVA_LIBRARY := $(BUILD_SYSTEM)/host_dalvik_java_library.mk
 BUILD_HOST_DALVIK_STATIC_JAVA_LIBRARY := $(BUILD_SYSTEM)/host_dalvik_static_java_library.mk
 
-
 # ###############################################################
 # Parse out any modifier targets.
 # ###############################################################
@@ -357,6 +356,9 @@ endif
 
 # define clang/llvm versions and base directory.
 include $(BUILD_SYSTEM)/clang/versions.mk
+
+# define sdclang LTO definitions
+include $(BUILD_SYSTEM)/sdllvm-lto-defs.mk
 
 # Disable WITH_STATIC_ANALYZER and WITH_SYNTAX_CHECK if tool can't be found
 SYNTAX_TOOLS_PREFIX := \
@@ -681,8 +683,7 @@ GLOBAL_CFLAGS_NO_OVERRIDE := \
 
 GLOBAL_CLANG_CFLAGS_NO_OVERRIDE := \
     -Werror=address-of-temporary \
-    -Werror=null-dereference \
-    -Werror=return-type \
+    -Werror=return-type
 
 GLOBAL_CPPFLAGS_NO_OVERRIDE :=
 
