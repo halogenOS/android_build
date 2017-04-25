@@ -13,7 +13,7 @@
 # or your physical core count when not using Hyperthreading
 # Here the virtual cores are always counted, which can be the same as
 # physical cores if not using Hyperthreading or a similar feature.
-CPU_COUNT=$(grep -c ^processor /proc/cpuinfo)
+CPU_COUNT=$(nproc --all)
 # Use 4 times the CPU count to build
 THREAD_COUNT_BUILD=$(($CPU_COUNT * 4))
 # Use doubled CPU count to sync (auto)
