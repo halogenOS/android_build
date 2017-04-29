@@ -10,9 +10,7 @@
 INSTALLED_BOOTIMAGE_TARGET := $(PRODUCT_OUT)/boot.img
 INSTALLED_RAMDISK_TARGET := $(PRODUCT_OUT)/ramdisk.img
 INSTALLED_SYSTEMIMAGE := $(PRODUCT_OUT)/system.img
-INSTALLED_USERDATAIMAGE_TARGET := $(PRODUCT_OUT)/userdata.img
 INSTALLED_RECOVERYIMAGE_TARGET := $(PRODUCT_OUT)/recovery.img
-INSTALLED_USERDATAIMAGE_TARGET := $(PRODUCT_OUT)/userdata.img
 recovery_ramdisk := $(PRODUCT_OUT)/ramdisk-recovery.img
 
 #----------------------------------------------------------------------
@@ -114,60 +112,6 @@ ALL_MODULES.$(LOCAL_MODULE).INSTALLED += $(INSTALLED_DTIMAGE_TARGET)
 endif
 
 #----------------------------------------------------------------------
-# Generate extra userdata images (for variants with multiple mmc sizes)
-#----------------------------------------------------------------------
-ifneq ($(BOARD_USERDATAEXTRAIMAGE_PARTITION_SIZE),)
-
-ifndef BOARD_USERDATAEXTRAIMAGE_PARTITION_NAME
-  BOARD_USERDATAEXTRAIMAGE_PARTITION_NAME := extra
-endif
-
-BUILT_USERDATAEXTRAIMAGE_TARGET := $(PRODUCT_OUT)/userdata_$(BOARD_USERDATAEXTRAIMAGE_PARTITION_NAME).img
-
-define build-userdataextraimage-target
-    $(call pretty,"Target EXTRA userdata fs image: $(INSTALLED_USERDATAEXTRAIMAGE_TARGET)")
-    @mkdir -p $(TARGET_OUT_DATA)
-    $(hide) $(MKEXTUSERIMG) -s $(TARGET_OUT_DATA) $@ ext4 data $(BOARD_USERDATAEXTRAIMAGE_PARTITION_SIZE)
-    $(hide) chmod a+r $@
-    $(hide) $(call assert-max-image-size,$@,$(BOARD_USERDATAEXTRAIMAGE_PARTITION_SIZE),yaffs)
-endef
-
-INSTALLED_USERDATAEXTRAIMAGE_TARGET := $(BUILT_USERDATAEXTRAIMAGE_TARGET)
-$(INSTALLED_USERDATAEXTRAIMAGE_TARGET): $(INSTALLED_USERDATAIMAGE_TARGET)
-	$(build-userdataextraimage-target)
-
-ALL_DEFAULT_INSTALLED_MODULES += $(INSTALLED_USERDATAEXTRAIMAGE_TARGET)
-ALL_MODULES.$(LOCAL_MODULE).INSTALLED += $(INSTALLED_USERDATAEXTRAIMAGE_TARGET)
-
-endif
-
-#----------------------------------------------------------------------
-# Generate 1GB userdata image for 8930
-#----------------------------------------------------------------------
-ifeq ($(call is-board-platform-in-list,msm8960),true)
-
-1G_USER_OUT := $(PRODUCT_OUT)/1g_user_image
-BOARD_1G_USERDATAIMAGE_PARTITION_SIZE := 5368709120
-INSTALLED_1G_USERDATAIMAGE_TARGET := $(1G_USER_OUT)/userdata.img
-
-define build-1g-userdataimage-target
-    $(call pretty,"Target 1G userdata fs image: $(INSTALLED_1G_USERDATAIMAGE_TARGET)")
-    @mkdir -p $(1G_USER_OUT)
-    $(hide) $(MKEXTUSERIMG) -s $(TARGET_OUT_DATA) $@ ext4 data $(BOARD_1G_USERDATAIMAGE_PARTITION_SIZE)
-    $(hide) chmod a+r $@
-    $(hide) $(call assert-max-image-size,$@,$(BOARD_1G_USERDATAIMAGE_PARTITION_SIZE),yaffs)
-endef
-
-$(INSTALLED_1G_USERDATAIMAGE_TARGET): $(INSTALLED_USERDATAIMAGE_TARGET)
-	$(build-1g-userdataimage-target)
-
-ALL_DEFAULT_INSTALLED_MODULES += $(INSTALLED_1G_USERDATAIMAGE_TARGET)
-ALL_MODULES.$(LOCAL_MODULE).INSTALLED += $(INSTALLED_1G_USERDATAIMAGE_TARGET)
-
-endif
-
-
-#----------------------------------------------------------------------
 # Generate NAND images
 #----------------------------------------------------------------------
 ifeq ($(call is-board-platform-in-list,msm7x27a msm7x30),true)
@@ -178,19 +122,16 @@ BCHECC_OUT := $(PRODUCT_OUT)/bchecc_images
 
 INSTALLED_2K_BOOTIMAGE_TARGET := $(2K_NAND_OUT)/boot.img
 INSTALLED_2K_SYSTEMIMAGE_TARGET := $(2K_NAND_OUT)/system.img
-INSTALLED_2K_USERDATAIMAGE_TARGET := $(2K_NAND_OUT)/userdata.img
 INSTALLED_2K_PERSISTIMAGE_TARGET := $(2K_NAND_OUT)/persist.img
 INSTALLED_2K_RECOVERYIMAGE_TARGET := $(2K_NAND_OUT)/recovery.img
 
 INSTALLED_4K_BOOTIMAGE_TARGET := $(4K_NAND_OUT)/boot.img
 INSTALLED_4K_SYSTEMIMAGE_TARGET := $(4K_NAND_OUT)/system.img
-INSTALLED_4K_USERDATAIMAGE_TARGET := $(4K_NAND_OUT)/userdata.img
 INSTALLED_4K_PERSISTIMAGE_TARGET := $(4K_NAND_OUT)/persist.img
 INSTALLED_4K_RECOVERYIMAGE_TARGET := $(4K_NAND_OUT)/recovery.img
 
 INSTALLED_BCHECC_BOOTIMAGE_TARGET := $(BCHECC_OUT)/boot.img
 INSTALLED_BCHECC_SYSTEMIMAGE_TARGET := $(BCHECC_OUT)/system.img
-INSTALLED_BCHECC_USERDATAIMAGE_TARGET := $(BCHECC_OUT)/userdata.img
 INSTALLED_BCHECC_PERSISTIMAGE_TARGET := $(BCHECC_OUT)/persist.img
 INSTALLED_BCHECC_RECOVERYIMAGE_TARGET := $(BCHECC_OUT)/recovery.img
 
@@ -265,15 +206,6 @@ define build-nand-systemimage
   $(hide) $(call assert-max-image-size,$@,$(BOARD_SYSTEMIMAGE_PARTITION_SIZE),yaffs)
 endef
 
-# Generate userdata image for NAND
-define build-nand-userdataimage
-  @echo "target NAND userdata image: $(3)"
-  $(hide) mkdir -p $(1)
-  $(hide) $(MKYAFFS2) -f $(2) $(TARGET_OUT_DATA) $(3)
-  $(hide) chmod a+r $(3)
-  $(hide) $(call assert-max-image-size,$@,$(BOARD_USERDATAIMAGE_PARTITION_SIZE),yaffs)
-endef
-
 # Generate persist image for NAND
 define build-nand-persistimage
   @echo "target NAND persist image: $(3)"
@@ -297,13 +229,6 @@ ifeq ($(call is-board-platform,msm7x27a),true)
 	$(hide) $(call build-nand-systemimage,$(BCHECC_OUT),$(INTERNAL_BCHECC_MKYAFFS2_FLAGS),$(INSTALLED_BCHECC_SYSTEMIMAGE_TARGET))
 endif # is-board-platform
 
-$(INSTALLED_4K_USERDATAIMAGE_TARGET): $(MKYAFFS2) $(INSTALLED_USERDATAIMAGE_TARGET)
-	$(hide) $(call build-nand-userdataimage,$(4K_NAND_OUT),$(INTERNAL_4K_MKYAFFS2_FLAGS),$(INSTALLED_4K_USERDATAIMAGE_TARGET))
-ifeq ($(call is-board-platform,msm7x27a),true)
-	$(hide) $(call build-nand-userdataimage,$(2K_NAND_OUT),$(INTERNAL_2K_MKYAFFS2_FLAGS),$(INSTALLED_2K_USERDATAIMAGE_TARGET))
-	$(hide) $(call build-nand-userdataimage,$(BCHECC_OUT),$(INTERNAL_BCHECC_MKYAFFS2_FLAGS),$(INSTALLED_BCHECC_USERDATAIMAGE_TARGET))
-endif # is-board-platform
-
 $(INSTALLED_4K_PERSISTIMAGE_TARGET): $(MKYAFFS2) $(INSTALLED_PERSISTIMAGE_TARGET)
 	$(hide) $(call build-nand-persistimage,$(4K_NAND_OUT),$(INTERNAL_4K_MKYAFFS2_FLAGS),$(INSTALLED_4K_PERSISTIMAGE_TARGET))
 ifeq ($(call is-board-platform,msm7x27a),true)
@@ -323,13 +248,11 @@ endif # is-board-platform
 ALL_DEFAULT_INSTALLED_MODULES += \
 	$(INSTALLED_4K_BOOTIMAGE_TARGET) \
 	$(INSTALLED_4K_SYSTEMIMAGE_TARGET) \
-	$(INSTALLED_4K_USERDATAIMAGE_TARGET) \
 	$(INSTALLED_4K_PERSISTIMAGE_TARGET)
 
 ALL_MODULES.$(LOCAL_MODULE).INSTALLED += \
 	$(INSTALLED_4K_BOOTIMAGE_TARGET) \
 	$(INSTALLED_4K_SYSTEMIMAGE_TARGET) \
-	$(INSTALLED_4K_USERDATAIMAGE_TARGET) \
 	$(INSTALLED_4K_PERSISTIMAGE_TARGET)
 
 ifneq ($(BUILD_TINY_ANDROID),true)
