@@ -164,6 +164,11 @@ def add_to_manifest_dependencies(repositories):
         except:
             repo_revision = "XOS-7.1"
             pass
+        try:
+            repo_clone_depth = repository['clone-depth']
+        except:
+            repo_clone_depth = None
+            pass
         existing_project = exists_in_tree(lm, repo_target)
         if existing_project != None:
             if existing_project.attrib['name'] != repository['repository']:
@@ -189,6 +194,8 @@ def add_to_manifest_dependencies(repositories):
 
         if 'branch' in repository:
             project.set('revision',repository['branch'])
+        if repo_clone_depth is not None:
+            project.set('clone-depth', repository['clone-depth'])
 
         lm.append(project)
 
