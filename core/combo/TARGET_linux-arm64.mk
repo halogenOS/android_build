@@ -36,10 +36,10 @@ endif
 # Decouple NDK library selection with platform compiler version
 TARGET_NDK_GCC_VERSION := 4.9
 
-ifeq ($(strip $(TARGET_GCC_VERSION_EXP)),)
+ifeq ($(strip $(TARGET_GCC_VERSION_EXP_ARM64)),)
 TARGET_GCC_VERSION := 4.9
 else
-TARGET_GCC_VERSION := $(TARGET_GCC_VERSION_EXP)
+TARGET_GCC_VERSION := $(TARGET_GCC_VERSION_EXP_ARM64)
 endif
 
 TARGET_ARCH_SPECIFIC_MAKEFILE := $(BUILD_COMBOS)/arch/$(TARGET_ARCH)/$(TARGET_ARCH_VARIANT).mk
@@ -86,6 +86,28 @@ TARGET_GLOBAL_CFLAGS += \
 			-no-canonical-prefixes \
 			-fno-canonical-system-headers \
 			$(arch_variant_cflags) \
+
+ifneq ($(TARGET_GCC_VERSION_EXP_ARM64),4.9)
+TARGET_GLOBAL_CFLAGS += -D__ANDROID__
+endif
+
+FUTURISTIC_GCC_VERSIONS := 5.0 5.3 6.0 7.0 7.1
+TARGET_GLOBAL_CFLAGS_FOR_FUTURE :=
+TARGET_GLOBAL_CPPFLAGS_FOR_FUTURE :=
+TARGET_GLOBAL_CLANG_FLAGS_FOR_FUTURE :=
+
+ifneq ($(filter $(TARGET_GCC_VERSION_EXP_ARM64),$(FUTURISTIC_GCC_VERSIONS)),)
+TARGET_GLOBAL_CFLAGS_FOR_FUTURE += \
+    -Wno-nonnull \
+    -Wno-nonnull-compare \
+    -Wno-misleading-indentation \
+    -Wno-unknown-warning-option
+TARGET_GLOBAL_CPPFLAGS_FOR_FUTURE += \
+    -Wno-nonnull-compare \
+    -Wno-misleading-indentation
+TARGET_GLOBAL_CLANG_FLAGS_FOR_FUTURE += \
+	-Wno-unknown-warning-option
+endif
 
 # Help catch common 32/64-bit errors.
 TARGET_GLOBAL_CFLAGS += \

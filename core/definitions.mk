@@ -1203,6 +1203,7 @@ define transform-cpp-to-o
 @echo -e ${CL_GRN}"target $(PRIVATE_ARM_MODE) C++:"${CL_RST}" $(PRIVATE_MODULE) <= $<"
 @mkdir -p $(dir $@)
 $(hide) $(RELATIVE_PWD) $(PRIVATE_CXX) \
+ $$([[ "$(PRIVATE_CXX)" == *"/clang"* ]] && echo -n "$(TARGET_GLOBAL_CLANG_FLAGS_FOR_FUTURE)" || echo -n "$(TARGET_GLOBAL_CPPFLAGS_FOR_FUTURE)") \
 	$(addprefix -I , $(PRIVATE_C_INCLUDES)) \
 	$(shell cat $(PRIVATE_IMPORT_INCLUDES)) \
 	$(addprefix -isystem ,\
@@ -1235,6 +1236,7 @@ endef
 define transform-c-or-s-to-o-no-deps
 @mkdir -p $(dir $@)
 $(hide) $(RELATIVE_PWD) $(PRIVATE_CC) \
+ $$([[ "$(PRIVATE_CC)" == *"/clang"* ]] && echo -n "$(TARGET_GLOBAL_CLANG_FLAGS_FOR_FUTURE)" || echo -n "$(TARGET_GLOBAL_CFLAGS_FOR_FUTURE)") \
 	$(addprefix -I , $(PRIVATE_C_INCLUDES)) \
 	$(shell cat $(PRIVATE_IMPORT_INCLUDES)) \
 	$(addprefix -isystem ,\
