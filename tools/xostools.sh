@@ -291,6 +291,56 @@ function reporeset() {
   repo forall -c 'git cherry-pick --abort; git revert --abort; git rebase --abort; git reset --hard XOS/XOS-7.1 || git reset --hard github/XOS-7.1 || git reset --hard HEAD || git stash' 2>/dev/null
 }
 
+# Completely cleans everything and deletes all untracked files
+function reposterilize() {
+  echo "Warning: Any unsaved work will be gone! Press CTRL+C to abort."
+  for i in {5..0}; do
+    echo -en "\r\033[K\rStarting sterilization in $i seconds"
+    sleep 1
+  done
+  local startdir="$(gettop)"
+  echo
+  while read dir; do
+    cd $startdir
+    if [[ "$dir" == *"${startdir}/.repo/"* ]]; then continue; fi
+    cd "$dir/../"
+    echo " - $(getPlatformPath)"
+    if [[ "$(getPlatformPath)" == "hardware/"* ]]; then
+      echo "  This is a hardware repository. Only resetting."
+      git reset
+      git reset --hard
+      git clean -f
+      continue
+    fi
+    if [[ "$(getPlatformPath)" == "prebuilts/"* ]]; then
+      echo "  This is a prebuilts repository. Only resetting."
+      git reset
+      git reset --hard
+      git clean -f
+      continue
+    fi
+    git revert --abort 2>/dev/null
+    git rebase --abort 2>/dev/null
+    git revert --abort 2>/dev/null
+    git rebase --abort 2>/dev/null
+    git cherry-pick --abort 2>/dev/null
+    git reset 2>/dev/null
+    git reset --hard XOS/XOS-7.1 2>/dev/null \
+ || git reset --hard github/XOS-7.1 2>/dev/null \
+ || git reset --hard gerrit/XOS-7.1 2>/dev/null \
+ || git reset --hard 2>/dev/null
+    git reset 2>/dev/null
+    # Check whether we are actually in a safe place
+    if [ -e "./.git/" ]; then
+      rm -rf ./*
+    fi
+    git checkout HEAD -- .
+    git clean -f
+  done < <(find "$startdir/" -name ".git" -type d)
+  cd "$startdir"
+  unset startdir
+}
+
 function resetmanifest() {
   cd $(gettop)/.repo/manifests
   git fetch origin XOS-7.1 2>&1 >/dev/null
