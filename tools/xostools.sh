@@ -302,7 +302,6 @@ function reposterilize() {
   fi
   echo "Warning: Any unsaved work will be gone! Press CTRL+C to abort."
   for i in {5..0}; do
-    clear
     echo -en "\r\033[K\rStarting sterilization in $i seconds"
     sleep 1
   done
