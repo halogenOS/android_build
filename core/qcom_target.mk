@@ -95,7 +95,11 @@ ifeq ($(BOARD_USES_QCOM_HARDWARE),true)
     endif
     endif
 
+ifeq ($(BOARD_AUDIO_HAL_PATH),)
 $(call project-set-path,qcom-audio,hardware/qcom/audio-caf/$(QCOM_HARDWARE_VARIANT))
+else
+$(call project-set-path,qcom-audio,$(BOARD_AUDIO_HAL_PATH))
+endif
 $(call project-set-path,qcom-display,hardware/qcom/display-caf/$(QCOM_HARDWARE_VARIANT))
 $(call project-set-path,qcom-media,hardware/qcom/media-caf/$(QCOM_HARDWARE_VARIANT))
 
@@ -112,7 +116,11 @@ $(call bt-vendor-set-path-variant,bt-caf)
 
 else
 
+ifeq ($(BOARD_AUDIO_HAL_PATH),)
 $(call project-set-path,qcom-audio,hardware/qcom/audio/default)
+else
+$(call project-set-path,qcom-audio,$(BOARD_AUDIO_HAL_PATH))
+endif
 $(call project-set-path,qcom-display,hardware/qcom/display/$(TARGET_BOARD_PLATFORM))
 $(call project-set-path,qcom-media,hardware/qcom/media)
 
