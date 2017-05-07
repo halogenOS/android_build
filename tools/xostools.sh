@@ -293,6 +293,13 @@ function reporeset() {
 
 # Completely cleans everything and deletes all untracked files
 function reposterilize() {
+  if [ "$(pwd)" == "$(realpath ~)" ]; then
+    echo "Aborted because you are in your home dir"
+    return 1
+  elif [ "$(gettop)" == "" ]; then
+    echo "Aborted, top is not set"
+    return 1
+  fi
   echo "Warning: Any unsaved work will be gone! Press CTRL+C to abort."
   for i in {5..0}; do
     clear
@@ -340,6 +347,7 @@ function reposterilize() {
   done < <(find "$startdir/" -name ".git" -type d)
   cd "$startdir"
   unset startdir
+  return 0
 }
 
 function resetmanifest() {
