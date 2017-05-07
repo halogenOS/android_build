@@ -1,7 +1,7 @@
 #!/bin/bash
 
 #
-# Copyright (C) 2016 halogenOS (XOS)
+# Copyright (C) 2016-2017 The halogenOS Project
 #
 
 #
@@ -295,6 +295,7 @@ function reporeset() {
 function reposterilize() {
   echo "Warning: Any unsaved work will be gone! Press CTRL+C to abort."
   for i in {5..0}; do
+    clear
     echo -en "\r\033[K\rStarting sterilization in $i seconds"
     sleep 1
   done
@@ -309,14 +310,14 @@ function reposterilize() {
       echo "  This is a hardware repository. Only resetting."
       git reset
       git reset --hard
-      git clean -f
+      git clean -f -d
       continue
     fi
     if [[ "$(getPlatformPath)" == "prebuilts/"* ]]; then
       echo "  This is a prebuilts repository. Only resetting."
       git reset
       git reset --hard
-      git clean -f
+      git clean -f -d
       continue
     fi
     git revert --abort 2>/dev/null
@@ -335,7 +336,7 @@ function reposterilize() {
       rm -rf ./*
     fi
     git checkout HEAD -- .
-    git clean -f
+    git clean -f -d
   done < <(find "$startdir/" -name ".git" -type d)
   cd "$startdir"
   unset startdir
