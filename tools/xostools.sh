@@ -337,11 +337,6 @@ function reposterilize() {
  || git reset --hard gerrit/XOS-7.1 2>/dev/null \
  || git reset --hard 2>/dev/null
     git reset 2>/dev/null
-    # Check whether we are actually in a safe place
-    if [ -e "./.git/" ]; then
-      rm -rf ./*
-    fi
-    git checkout HEAD -- .
     git clean -f -d
   done < <(find "$startdir/" -name ".git" -type d)
   cd "$startdir"
