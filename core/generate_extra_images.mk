@@ -193,8 +193,8 @@ define build-nand-bootimage
 	@echo "target NAND boot image: $(3)"
 	$(hide) mkdir -p $(1)
 	$(hide) $(MKBOOTIMG) $(2) --output $(3)
-endef
 	$(hide) $(call assert-max-image-size,$@,$(BOARD_BOOTIMAGE_PARTITION_SIZE),raw)
+endef
 endif
 
 # Generate system image for NAND
