@@ -370,7 +370,10 @@ ifneq (,$(user_variant))
   ADDITIONAL_DEFAULT_PROPERTIES += security.perf_harden=1
 
   ifeq ($(user_variant),user)
-    ADDITIONAL_DEFAULT_PROPERTIES += ro.adb.secure=1
+    # Don't do this if it was forcefully set
+    ifneq ($(TARGET_KERNEL_BUILD_VARIANT),user)
+      ADDITIONAL_DEFAULT_PROPERTIES += ro.adb.secure=1
+    endif
   endif
 
   ifeq ($(user_variant),userdebug)
