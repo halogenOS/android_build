@@ -2147,8 +2147,6 @@ else
 bacon: otapackage
 endif
 
-ifneq ($(TARGET_CUSTOM_RELEASETOOL),)
-endif
 	$(hide) ln -f $(INTERNAL_OTA_PACKAGE_TARGET) $(XOS_TARGET_PACKAGE)
 	$(hide) $(MD5SUM) $(XOS_TARGET_PACKAGE) | sed "s|$(PRODUCT_OUT)/||" > $(XOS_TARGET_PACKAGE).md5sum
 	@echo "Package Complete: $(XOS_TARGET_PACKAGE)"
