@@ -476,10 +476,8 @@ def BuildImage(in_dir, prop_dict, out_file, target_out=None):
 
   try:
     if reserved_blocks and fs_type.startswith("ext4"):
-      print "fs type is ext4"
       (ext4fs_output, exit_code) = RunCommand(build_command)
     else:
-      print "fs type is not ext4"
       (_, exit_code) = RunCommand(build_command)
     print("Running %s command, exit code = %d" % (build_command, exit_code))
   finally:
