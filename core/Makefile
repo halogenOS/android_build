@@ -1906,7 +1906,9 @@ endif # BOARD_USES_RECOVERY_AS_BOOT
 	$(hide) mkdir -p $(zip_root)/BOOTABLE_IMAGES
 	$(hide) $(ACP) $(INSTALLED_BOOTIMAGE_TARGET) $(zip_root)/BOOTABLE_IMAGES/
 ifneq ($(BOARD_USES_RECOVERY_AS_BOOT),true)
+ifneq ($(TARGET_NO_RECOVERY),true)
 	$(hide) $(ACP) $(INSTALLED_RECOVERYIMAGE_TARGET) $(zip_root)/BOOTABLE_IMAGES/
+endif
 endif
 ifdef BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE
 	@# Contents of the vendor image
