@@ -733,6 +733,9 @@ function lunch()
     set_stuff_for_environment
     printconfig
     destroy_build_var_cache
+
+    # Make sure that jack is working
+    JACK > /dev/null
 }
 
 # Tab completion for lunch.
@@ -1790,8 +1793,6 @@ function get_make_command()
 
 function make()
 {
-    # Make sure that jack is working
-    JACK > /dev/null
     local start_time=$(date +"%s")
     $(get_make_command) "$@"
     local ret=$?
@@ -1825,7 +1826,6 @@ function make()
     fi
     echo " ####${color_reset}"
     echo
-    prebuilts/sdk/tools/jack-admin stop-server 2>&1 >/dev/null
     return $ret
 }
 
