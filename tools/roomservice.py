@@ -169,10 +169,6 @@ def add_to_manifest_dependencies(repositories):
         except:
             repo_clone_depth = None
             pass
-        blocked_repos = ['device_qcom_common']
-        for repo in blocked_repos:
-            if repo in repository['repository']:
-                raise ValueError("%s should not be fetched via roomservice" % repository['repository'])
         existing_project = exists_in_tree(lm, repo_target)
         if existing_project != None:
             if existing_project.attrib['name'] != repository['repository']:
