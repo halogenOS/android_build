@@ -70,13 +70,7 @@ KERNEL_OUT := $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ
 KERNEL_CONFIG := $(KERNEL_OUT)/.config
 KERNEL_OUT_STAMP := $(KERNEL_OUT)/.mkdir_stamp
 
-# M uses 4.9 gcc by default, and it's not available in their repos
-# So, use 4.8 gcc for the time being.
-ifeq ($(TARGET_KERNEL_ARCH),arm64)
 KERNEL_GCC_VERSION ?= 4.9
-else
-KERNEL_GCC_VERSION ?= 4.8
-endif
 
 TARGET_KERNEL_ARCH := $(strip $(TARGET_KERNEL_ARCH))
 ifeq ($(TARGET_KERNEL_ARCH),)
