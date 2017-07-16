@@ -234,7 +234,10 @@ if __name__ == '__main__':
         reviews = fetch_query(args.gerrit, args.query)
         change_numbers = sorted([str(r['number']) for r in reviews])
     if args.change_number:
-        reviews = fetch_query(args.gerrit, ' OR '.join('change:{0}'.format(x.split('/')[0]) for x in args.change_number))
+        try:
+            reviews = fetch_query(args.gerrit, ' OR '.join('change:{0}'.format(x.split('/')[0]) for x in args.change_number))
+        except urllib2.HTTPError:
+            reviews = fetch_query(args.gerrit[0:-1], ' OR '.join('change:{0}'.format(x.split('/')[0]) for x in args.change_number))
         change_numbers = args.change_number
 
     # make list of things to actually merge
