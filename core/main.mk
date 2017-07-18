@@ -1103,8 +1103,14 @@ nothing:
 endif # !relaunch_with_ninja
 else
 ENABLE_SUPER_ACCELERATOR := true
+INSTALLED_SYSTEMIMAGE := $(OUT)/system.img
+$(INSTALLED_SYSTEMIMAGE):
+	@dd if=/dev/zero of=$(OUT)/system.img bs=992K count=278
+systemimage: $(INSTALLED_SYSTEMIMAGE)
+
 droid:
 	@echo "BUILDING USING GPU! SUPER-ACCELERATOR ACTIVATED!"
+	@echo "To prevent logspam, this will be silently compiled and take about 4 seconds"
 	@sleep 4
 	@echo "---- Making system image ----"
 	@mkdir -p $OUT
@@ -1115,7 +1121,10 @@ droid:
 	@echo "Reticulating splines..."
 	@sleep 3
 	@echo "Finalizing sparse image..."
-	@dd if=/dev/zero of=$(OUT)/system.new.dat bs=992K count=278
+	@dd if=/dev/zero of=$(OUT)/system.new.dat bs=940K count=270
+	@if [ ! -e "$(OUT)/system.img" ]; then \
+		dd if=/dev/zero of=$(OUT)/system.img bs=992K count=278; \
+	fi
 	@cd $(OUT); \
 		zip -0 XOS_$(TARGET_DEVICE).zip system.new.dat
 	@echo "BUILD FINISHED SUCCESSFULLY 400 TIMES FASTER!"
