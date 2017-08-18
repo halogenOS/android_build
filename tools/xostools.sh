@@ -234,6 +234,7 @@ function reporesync() {
             [[ ! $REPLY =~ ^[Yy]$ ]] && echoe "\nAborted." && return 1
             fi
             # Print some lines of words
+            echoe "\n"
             echob "Full source tree resync will start now."
             # Just in case...
             echo  "Your current directory is: $(pwd)"
